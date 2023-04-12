@@ -20,6 +20,7 @@ const handleChange = (e) => {
 const handleSubmit = (e) => {
     e.preventDefault();
     addToList(inputValue);
+
     setInputValue( {
         ...inputValue,
         text: "",

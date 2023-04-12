@@ -1,31 +1,62 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import ListInput from "./ListInput";
 import ToDoItem from "./ToDoItem";
+import axios from "axios";
 
 
 const App = () => {
 
+    const baseUrl = `https://todo-list-project-fb3fe-default-rtdb.europe-west1.firebasedatabase.app`;
+
+    useEffect(() => {
+        getList()
+    }, []);
+
+
+    const turnDataObjectIntoArray = (data) => data
+            ? Object.keys(data).map((key) => ({...data[key], id: key}))
+            : []
+
     let [list, updateList] = useState([]);
-    const [nextId, setNextId] = useState(0);
+
 
     const addToList = (listItem) => {
-        updateList([...list, {...listItem, id: nextId}]);
-        setNextId(nextId + 1)
+        addItemToList(listItem)
+
     }
 
-
-    const deleteItem = (listItem) => {
-        updateList(list = list.filter((item) => item !== listItem))
+    const addItemToList = (listItem) => {
+        axios({
+            url: `${baseUrl}/items.json`,
+            method: 'post',
+            data: listItem,
+        }).then(getList)
     }
 
-    const updateItem = (updatedItem) => {
-        const newList = list.map((item) => {
-            if (item.id === updatedItem.id) {
-                return updatedItem
-            }
-            return item
+    const getList = () => {
+        return axios({
+            method: 'get',
+            url: `${baseUrl}/items.json`
+        }).then(({ data }) => {
+            updateList(turnDataObjectIntoArray(data))
         })
-        updateList(newList)
+    }
+
+
+    const deleteItem = ( listItem ) => {
+        return axios({
+            method: 'delete',
+            url: `${baseUrl}/items/${listItem.id}.json`
+        }).then(getList);
+    }
+
+    const updateItem = ({ checked, id }) => {
+
+        return axios ({
+            method: 'patch',
+            url: `${baseUrl}/items/${id}.json`,
+            data: {checked}
+        }).then(getList);
     }
 
 

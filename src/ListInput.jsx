@@ -1,17 +1,29 @@
-import {Button, Container, TextField} from "@mui/material";
+import {Button, TextField} from "@mui/material";
 import {useState} from "react";
 
 const ListInput = ( { addToList } ) => {
 
-let [ inputValue, setInputValue ] = useState("");
+let [ inputValue, setInputValue ] = useState(
+    {
+    text: "",
+    checked: false,
+}
+);
 
 const handleChange = (e) => {
-    setInputValue(inputValue = e.target.value)
+    setInputValue({
+        ...inputValue,
+        text: e.target.value
+    })
 }
 
 const handleSubmit = (e) => {
     e.preventDefault();
     addToList(inputValue);
+    setInputValue( {
+        ...inputValue,
+        text: "",
+    })
 }
 
 
@@ -21,7 +33,7 @@ const handleSubmit = (e) => {
                 fullWidth
                 name="listInput"
                 label="Add Item:"
-                value={inputValue}
+                value={inputValue.text}
                 onChange={handleChange}
             />
             <Button type="submit">Submit</Button>

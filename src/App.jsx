@@ -11,17 +11,29 @@ const App = () => {
     let [listOfLists, updateListOfLists] = useState([]);
 
     const addToListOfLists = (newList) => {
-        updateListOfLists([...listOfLists, newList])
+        axios({
+            url: `${baseUrl}/lists.json`,
+            method: 'post',
+            data: newList,
+        }).then(getLists)
+    }
+    const getLists = () => {
+        return axios({
+            method: 'get',
+            url: `${baseUrl}/lists.json`
+        }).then(({ data }) => {
+            updateListOfLists(turnDataObjectIntoArray(data))
+        })
     }
 
-    let [currentList, setCurrentList] = useState(listOfLists[0] || "");
+    let [currentList, setCurrentList] = useState("");
 
 
 
     const baseUrl = `https://todo-list-project-fb3fe-default-rtdb.europe-west1.firebasedatabase.app`;
 
     useEffect(() => {
-        getList()
+        getList(); getLists()
     }, []);
 
 
@@ -38,7 +50,7 @@ const App = () => {
 
     const addItemToList = (listItem) => {
         axios({
-            url: `${baseUrl}/${currentList.name}/items.json`,
+            url: `${baseUrl}/lists/${currentList.id}/items.json`,
             method: 'post',
             data: listItem,
         }).then(getList)
@@ -47,7 +59,7 @@ const App = () => {
     const getList = () => {
         return axios({
             method: 'get',
-            url: `${baseUrl}/${currentList.name}/items.json`
+            url: `${baseUrl}/lists/${currentList.id}/items.json`
         }).then(({ data }) => {
             updateList(turnDataObjectIntoArray(data))
         })
@@ -57,7 +69,7 @@ const App = () => {
     const deleteItem = ( listItem ) => {
         return axios({
             method: 'delete',
-            url: `${baseUrl}/${currentList.name}/items/${listItem.id}.json`
+            url: `${baseUrl}/lists/${currentList.id}/items/${listItem.id}.json`
         }).then(getList);
     }
 
@@ -74,7 +86,7 @@ const App = () => {
     return (
         <>
             <AddList addToListOfLists={addToListOfLists}/>
-            <ListSelector listOfLists={listOfLists} currentList={currentList} setCurrentList={setCurrentList}/>
+            <ListSelector listOfLists={listOfLists} currentList={currentList} setCurrentList={setCurrentList} getList={getList}/>
             <ListInput addToList={addToList}/>
             {list.map((item, i) => <ToDoItem updateItem={updateItem} key={i} item={item} deleteItem={deleteItem}/>)}
         </>

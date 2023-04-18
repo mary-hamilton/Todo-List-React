@@ -1,7 +1,7 @@
 import {Button, MenuItem, Select} from "@mui/material";
 import {useState} from "react";
 
-const ListSelector = ( {listOfLists, currentList, setCurrentList} ) => {
+const ListSelector = ( {listOfLists, currentList, setCurrentList, getList} ) => {
 
     const [selectedList, setSelectedList] = useState(currentList)
     const changeList = (e) => {
@@ -11,6 +11,7 @@ const ListSelector = ( {listOfLists, currentList, setCurrentList} ) => {
 
     const handleSubmit = () => {
         setCurrentList(selectedList)
+        getList();
         console.log(currentList)
     }
 
